@@ -1,0 +1,40 @@
+services:
+  mysql2:
+    container_name: mysql2
+    image: mysql:8.0.39
+    ports:
+      - "3306:3306"
+    volumes:
+      - "$PWD/mysql-data:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: "%"
+    networks:
+      site-3-net:
+        ipv4_address: 172.19.0.5
+  mysql-workbench:
+    image: lscr.io/linuxserver/mysql-workbench:latest
+    container_name: mysql-workbench
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - "$PWD/mysql-workbench:/config"
+    ports:
+      - 3000:3000
+      - 3001:3001
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
+    networks:
+      site-3-net:
+        ipv4_address: 172.19.0.6
+
+networks:
+  site-3-net:
+    name: site-3-net
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
